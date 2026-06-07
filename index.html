@@ -1,270 +1,613 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Code Generator</title>
-
+<title>DAXYZ Dev Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+*{box-sizing:border-box;margin:0;padding:0;}
+
 body{
-    font-family: Arial;
-    margin: 20px;
-    background:#f6fff6;
+    font-family:'Sora',Arial,sans-serif;
+    background:#0d1117;
+    color:#e6edf3;
+    min-height:100vh;
 }
 
-/* 🟢 Minimal green style */
-h2{
-    color:#1b5e20;
+/* ── TAB BAR ── */
+.tabbar{
+    display:flex;
+    background:#161b22;
+    border-bottom:1.5px solid #21262d;
+    padding:0 20px;
+    gap:4px;
 }
 
-textarea{
-    width:420px;
-    height:70px;
-    padding:8px;
-    border:1px solid #a5d6a7;
-    border-radius:6px;
-}
-
-button{
-    margin:4px;
-    padding:6px 10px;
+.tab-btn{
+    padding:14px 22px;
+    font-family:'Sora',sans-serif;
+    font-size:13px;
+    font-weight:600;
+    color:#8b949e;
+    background:none;
     border:none;
+    cursor:pointer;
+    border-bottom:2.5px solid transparent;
+    transition:all 0.2s;
+    letter-spacing:0.3px;
+}
+
+.tab-btn:hover{color:#3fb950;}
+
+.tab-btn.active{
+    color:#3fb950;
+    border-bottom-color:#3fb950;
+}
+
+/* ── PANELS ── */
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* ══════════════════════════════════════
+   PANEL 1 — DAXYZ Code Generator
+═══════════════════════════════════════ */
+#p1{
+    padding:24px;
+    max-width:1260px;
+}
+
+#p1 h2{
+    font-size:20px;
+    font-weight:700;
+    color:#3fb950;
+    margin-bottom:6px;
+}
+
+#p1 .subtitle{
+    font-size:12px;
+    color:#8b949e;
+    margin-bottom:20px;
+}
+
+#p1 input[type="text"],
+#p1 textarea,
+#p1 select{
+    width:100%;
+    padding:9px 12px;
+    background:#0d1117;
+    border:1px solid #30363d;
+    border-radius:7px;
+    color:#e6edf3;
+    font-family:'Sora',sans-serif;
+    font-size:13px;
+    outline:none;
+    transition:border 0.2s;
+}
+
+#p1 input[type="text"]:focus,
+#p1 textarea:focus{border-color:#3fb950;}
+
+#p1 textarea{height:72px;resize:vertical;}
+
+#p1 .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:7px 14px;
+    font-family:'Sora',sans-serif;
+    font-size:12px;
+    font-weight:600;
+    background:#238636;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    transition:background 0.2s;
+}
+#p1 .btn:hover{background:#2ea043;}
+#p1 .btn.danger{background:#da3633;}
+#p1 .btn.danger:hover{background:#f85149;}
+#p1 .btn.ghost{background:#21262d;color:#8b949e;}
+#p1 .btn.ghost:hover{background:#30363d;color:#e6edf3;}
+
+.btn-row{display:flex;gap:8px;margin:10px 0;}
+
+#p1 .counter{
+    font-size:12px;
+    font-weight:600;
+    color:#3fb950;
+    margin:8px 0;
+}
+
+.tags{margin:6px 0;display:flex;flex-wrap:wrap;gap:5px;}
+
+.tag{
+    display:inline-block;
+    padding:3px 9px;
+    border-radius:20px;
+    font-size:11px;
+    background:#23863622;
+    border:1px solid #23863655;
+    color:#3fb950;
+}
+
+.tag.dup{
+    background:#da363322;
+    border:1px solid #da363355;
+    color:#f85149;
+}
+
+.tag.hide{display:none;}
+
+.output-section{margin-top:18px;}
+
+.out-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:5px;
+}
+
+.out-header h3{
+    font-size:12px;
+    font-weight:600;
+    color:#8b949e;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+}
+
+.copy-btn{
+    font-family:'Sora',sans-serif;
+    font-size:11px;
+    padding:3px 10px;
+    background:#21262d;
+    border:1px solid #30363d;
+    color:#8b949e;
     border-radius:5px;
     cursor:pointer;
-    background:#2e7d32;
-    color:white;
+    transition:all 0.15s;
 }
+.copy-btn:hover{background:#30363d;color:#e6edf3;}
+.copy-btn.copied{background:#238636;color:#fff;border-color:#238636;}
 
-button:hover{
-    background:#1b5e20;
-}
-
-select{
-    width:420px;
-    margin-top:5px;
-    padding:5px;
-}
-
-/* OUTPUT BOX */
 pre{
-    background:#ffffff;
-    border:1px solid #c8e6c9;
-    padding:10px;
-    height:180px;
+    background:#0d1117;
+    border:1px solid #21262d;
+    border-radius:7px;
+    padding:12px 14px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:#7ee787;
+    height:110px;
     overflow:auto;
     white-space:pre-wrap;
-    border-radius:6px;
-}
-</style>
-<style>
-.tag {
-    display:inline-block;
-    padding:4px 8px;
-    margin:3px;
-    border-radius:5px;
-    font-size:12px;
-    background:#e8f5e9;
-    border:1px solid #a5d6a7;
+    line-height:1.6;
 }
 
-.tag.dup {
-    background:#ffebee;
-    border:1px solid red;
-    color:red;
-}
-</style>
-<style>
-#duplicateList {
-    margin-top:10px;
+.divider{
+    border:none;
+    border-top:1px solid #21262d;
+    margin:20px 0;
 }
 
-.tag {
-    display:inline-block;
-    padding:4px 8px;
-    margin:3px;
-    border-radius:5px;
-    font-size:12px;
-    background:#e8f5e9;
-    border:1px solid #a5d6a7;
-}
+/* template row */
+.tpl-row{display:flex;gap:8px;align-items:center;}
+.tpl-row select{flex:1;}
 
-.tag.dup {
-    background:#ffebee;
-    border:1px solid red;
-    color:red;
-}
-
-.tag.hide {
+/* ══════════════════════════════════════
+   PANEL 2 — Advanced JS (preview(1))
+═══════════════════════════════════════ */
+#p2{
     display:none;
+    height:calc(100vh - 50px);
 }
+#p2.active{display:flex;}
+
+#p2 .left{
+    width:38%;
+    padding:20px;
+    background:#161b22;
+    border-right:1.5px solid #21262d;
+    overflow:auto;
+}
+
+#p2 .right{
+    flex:1;
+    padding:20px;
+    background:#0d1117;
+    overflow:auto;
+}
+
+#p2 h3{
+    font-size:14px;
+    font-weight:600;
+    color:#3fb950;
+    margin-bottom:16px;
+}
+
+#p2 label{
+    display:block;
+    font-size:11px;
+    font-weight:600;
+    color:#8b949e;
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+    margin:12px 0 4px;
+}
+
+#p2 input{
+    width:100%;
+    padding:8px 10px;
+    background:#0d1117;
+    border:1px solid #30363d;
+    border-radius:6px;
+    color:#e6edf3;
+    font-family:'Sora',sans-serif;
+    font-size:13px;
+    outline:none;
+}
+#p2 input:focus{border-color:#3fb950;}
+
+#p2 .gen-btn{
+    width:100%;
+    padding:10px;
+    background:#238636;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    font-family:'Sora',sans-serif;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    margin-top:16px;
+    transition:background 0.2s;
+}
+#p2 .gen-btn:hover{background:#2ea043;}
+
+#p2 pre{
+    height:auto;
+    min-height:300px;
+    font-size:12.5px;
+    color:#7ee787;
+    background:#0d1117;
+    border:1px solid #21262d;
+}
+
+#p2 .copy-btn{
+    margin-top:12px;
+    width:100%;
+    padding:9px;
+    background:#21262d;
+    border:1px solid #30363d;
+    border-radius:6px;
+    color:#8b949e;
+    font-family:'Sora',sans-serif;
+    font-size:12px;
+    cursor:pointer;
+    transition:all 0.2s;
+}
+#p2 .copy-btn:hover{background:#30363d;color:#e6edf3;}
+
+/* ══════════════════════════════════════
+   PANEL 3 — Live Editor (preview)
+═══════════════════════════════════════ */
+#p3{
+    display:none;
+    height:calc(100vh - 50px);
+}
+#p3.active{display:flex;}
+
+#p3 .left{
+    width:38%;
+    padding:20px;
+    background:#161b22;
+    border-right:1.5px solid #21262d;
+    overflow:auto;
+}
+
+#p3 .right{
+    flex:1;
+    padding:20px;
+    background:#0d1117;
+    overflow:auto;
+}
+
+#p3 h2{
+    font-size:16px;
+    font-weight:700;
+    color:#3fb950;
+    margin-bottom:16px;
+}
+
+#p3 label{
+    display:block;
+    font-size:11px;
+    font-weight:600;
+    color:#8b949e;
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+    margin:12px 0 4px;
+}
+
+#p3 input{
+    width:100%;
+    padding:8px 10px;
+    background:#0d1117;
+    border:1px solid #30363d;
+    border-radius:6px;
+    color:#e6edf3;
+    font-family:'Sora',sans-serif;
+    font-size:13px;
+    outline:none;
+}
+#p3 input:focus{border-color:#3fb950;}
+
+#p3 .gen-btn{
+    width:100%;
+    padding:10px;
+    background:#238636;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    font-family:'Sora',sans-serif;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    margin-top:16px;
+    transition:background 0.2s;
+}
+#p3 .gen-btn:hover{background:#2ea043;}
+
+#p3 pre{
+    height:auto;
+    min-height:300px;
+    font-size:12.5px;
+    color:#7ee787;
+    background:#0d1117;
+    border:1px solid #21262d;
+}
+
+#p3 .copy-btn{
+    margin-top:12px;
+    width:100%;
+    padding:9px;
+    background:#21262d;
+    border:1px solid #30363d;
+    border-radius:6px;
+    color:#8b949e;
+    font-family:'Sora',sans-serif;
+    font-size:12px;
+    cursor:pointer;
+    transition:all 0.2s;
+}
+#p3 .copy-btn:hover{background:#30363d;color:#e6edf3;}
 </style>
 </head>
-
 <body>
 
-<h2>DAXYZ Code Generator Tool</h2>
-<input type="text" id="searchBox" placeholder="Search fields..." style="width:420px;padding:6px;margin-top:6px;">
+<!-- ── TAB BAR ── -->
+<div class="tabbar">
+    <button class="tab-btn active" onclick="switchTab('p1',this)">⚙ MULTIPEL ID'S CRUD</button>
+    <button class="tab-btn" onclick="switchTab('p2',this)">🔍 FORONT FILE CURD 1st</button>
+    <button class="tab-btn" onclick="switchTab('p3',this)">✏ FORONT FILE CURD 2nd</button>
+</div>
 
-<br>
-<br>
+<!-- ══ PANEL 1: DAXYZ Code Generator ══ -->
+<div id="p1" class="panel active">
+    <h2>DAXYZ Code Generator</h2>
+    <p class="subtitle">Enter field names comma-separated to generate code snippets</p>
 
-<textarea id="input" placeholder="chk_id, id_1, id_2, id_3"></textarea>
+    <input type="text" id="searchBox" placeholder="🔍 Search fields...">
+    <br><br>
+    <textarea id="input" placeholder="chk_id, id_1, id_2, id_3"></textarea>
 
-<br>
+    <div id="counter" class="counter"></div>
+    <div id="duplicateList" class="tags"></div>
 
-<div id="counter" style="margin:8px 0;font-weight:bold;color:#1b5e20;"></div>
-<div id="duplicateList" style="margin:8px 0;"></div>
+    <div class="btn-row">
+        <button class="btn" onclick="generate()">▶ Generate</button>
+        <button class="btn ghost" onclick="saveTemplate()">💾 Save Template</button>
+    </div>
 
-<br>
+    <div class="tpl-row">
+        <select id="templates" onchange="loadTemplate()"></select>
+        <button class="btn danger" onclick="deleteTemplate()">🗑</button>
+    </div>
 
-<button onclick="generate()">Generate</button>
-<button onclick="saveTemplate()">💾 Save</button>
+    <hr class="divider">
 
-<br>
+    <!-- OUTPUT BLOCKS -->
+    <div class="output-section">
+        <div class="out-header">
+            <h3>1. billData first &amp; second — Front file</h3>
+            <button class="copy-btn" onclick="copyText('jsOut',this)">Copy</button>
+        </div>
+        <pre id="jsOut"></pre>
+    </div>
 
-<select id="templates" onchange="loadTemplate()"></select>
-<button onclick="deleteTemplate()">🗑 Delete</button>
+    <div class="output-section">
+        <div class="out-header">
+            <h3>2. action_type = data</h3>
+            <button class="copy-btn" onclick="copyText('jqOut',this)">Copy</button>
+        </div>
+        <pre id="jqOut"></pre>
+    </div>
 
-<hr>
+    <div class="output-section">
+        <div class="out-header">
+            <h3>3. action_type = add</h3>
+            <button class="copy-btn" onclick="copyText('phpOut',this)">Copy</button>
+        </div>
+        <pre id="phpOut"></pre>
+    </div>
 
-<h3>1. billData first & second in Front file<button onclick="copyText('jsOut')">Copy</button></h3>
-<input type="checkbox" value="yes">
-<pre id="jsOut"></pre>
+    <div class="output-section">
+        <div class="out-header">
+            <h3>4. upper in insert</h3>
+            <button class="copy-btn" onclick="copyText('sqlOut',this)">Copy</button>
+        </div>
+        <pre id="sqlOut"></pre>
+    </div>
 
-<h3>2. action_type = data <button onclick="copyText('jqOut')">Copy</button></h3>
-<input type="checkbox" value="yes">
-<pre id="jqOut"></pre>
+    <div class="output-section">
+        <div class="out-header">
+            <h3>5. down in insert</h3>
+            <button class="copy-btn" onclick="copyText('sqlOut2',this)">Copy</button>
+        </div>
+        <pre id="sqlOut2"></pre>
+    </div>
 
-<h3>3. action_type = add <button onclick="copyText('phpOut')">Copy</button></h3>
-<input type="checkbox" value="yes">
-<pre id="phpOut"></pre>
+    <div class="output-section">
+        <div class="out-header">
+            <h3>6. Update</h3>
+            <button class="copy-btn" onclick="copyText('sqlOut3',this)">Copy</button>
+        </div>
+        <pre id="sqlOut3"></pre>
+    </div>
+</div>
 
-<h3>4. uper in insert<button onclick="copyText('sqlOut')">Copy</button></h3>
-<input type="checkbox" value="yes">
-<pre id="sqlOut"></pre>
+<!-- ══ PANEL 2: Advanced JS (preview_1) ══ -->
+<div id="p2" class="panel">
+    <div class="left">
+        <h3>Input</h3>
 
-<h3>5. down in insert<button onclick="copyText('sqlOut2')">Copy</button></h3>
-<input type="checkbox" value="yes">
-<pre id="sqlOut2"></pre>
+        <label>Key</label>
+        <input id="p2_key" value="hyd" oninput="p2Generate()">
 
-<h3>6. Update <button onclick="copyText('sqlOut3')">Copy</button></h3>
-<input type="checkbox" value="yes">
-<pre id="sqlOut3"></pre>
+        <label>Checkbox ID</label>
+        <input id="p2_chk" value="chk_hyd" oninput="p2Generate()">
+
+        <label>Textbox ID</label>
+        <input id="p2_txt" value="txthyd" oninput="p2Generate()">
+
+        <label>Fields (comma separated)</label>
+        <input id="p2_fields" value="hyd_1,hyd_2,hyd_3,hyd_4,hyd_5" oninput="p2Generate()">
+
+        <button class="gen-btn" onclick="p2Generate()">▶ Generate</button>
+    </div>
+
+    <div class="right">
+        <h3>Output</h3>
+        <pre id="p2Output"></pre>
+        <button class="copy-btn" onclick="copyPre('p2Output',this)">📋 Copy Code</button>
+    </div>
+</div>
+
+<!-- ══ PANEL 3: Live Editor (preview) ══ -->
+<div id="p3" class="panel">
+    <div class="left">
+        <h2>Input Panel</h2>
+
+        <label>Textbox Key</label>
+        <input id="p3_key" value="hyd" oninput="p3Generate()">
+
+        <label>Checkbox ID</label>
+        <input id="p3_chk" value="chk_hyd" oninput="p3Generate()">
+
+        <label>Textarea IDs (comma separated)</label>
+        <input id="p3_fields" value="hyd_1,hyd_2,hyd_3,hyd_4,hyd_5" oninput="p3Generate()">
+
+        <button class="gen-btn" onclick="p3Generate()">▶ Generate</button>
+    </div>
+
+    <div class="right">
+        <h2>Live Preview Output</h2>
+        <pre id="p3Output"></pre>
+        <button class="copy-btn" onclick="copyPre('p3Output',this)">📋 Copy Code</button>
+    </div>
+</div>
 
 <script>
+/* ── TAB SWITCHING ── */
+function switchTab(id, btn){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+}
 
+/* ══ PANEL 1 LOGIC ══ */
 document.getElementById("input").addEventListener("input", generate);
 
-// ---------- GENERATE ----------
 function generate(){
-
     let input = document.getElementById("input").value;
     let fields = input.split(",");
 
-    let seen = {};
-    let total = 0;
-    let unique = 0;
-
-    let jsResult = "";
-    let jqResult = "";
-    let phpResult = "";
-	let sqlResult = "";
-	let sqlResult2 = "";
-	let sqlResult3 = "";
-    let dupHTML = "";
+    let seen={}, total=0, unique=0;
+    let jsResult="", jqResult="", phpResult="";
+    let sqlResult="", sqlResult2="", sqlResult3="";
+    let dupHTML="";
 
     for(let f of fields){
-
         let key = f.trim();
         if(!key) continue;
-
         total++;
 
-        // ❌ duplicate check
         if(seen[key]){
-            dupHTML += `<span class="tag dup">❌ ${key} (duplicate)</span>`;
+            dupHTML += `<span class="tag dup">❌ ${key} (dup)</span>`;
             continue;
         }
 
-        seen[key] = true;
-        unique++;
-
+        seen[key]=true; unique++;
         dupHTML += `<span class="tag">✔ ${key}</span>`;
 
-        jsResult += " + '&"+key+"=' + "+key;
-        jqResult += "'" + key + "' => $result['" + key + "'],\n";
-        phpResult += "$" + key + " = $_POST['" + key + "'];\n";
-		sqlResult += "`" + key + "`, ";
-		sqlResult2 += "'$" + key + "', ";
-		sqlResult3 += "`" + key + "` = '$_POST[" + key + "]',\n";
-				 
-		
+        jsResult    += " + '&"+key+"=' + "+key;
+        jqResult    += "'"+key+"' => $result['"+key+"'],\n";
+        phpResult   += "$"+key+" = $_POST['"+key+"'];\n";
+        sqlResult   += "`"+key+"`, ";
+        sqlResult2  += "'$"+key+"', ";
+        sqlResult3  += "`"+key+"` = '$_POST["+key+"]',\n";
     }
-	if(jqResult){
-		jqResult = "" + jqResult.slice(0, -2);
-	}
-	if(sqlResult){
-		sqlResult = ", " + sqlResult.slice(0, -2);
-	}
-	if(sqlResult2){
-		sqlResult2 = ", " + sqlResult2.slice(0, -2);
-	}
-	if(sqlResult3){
-		sqlResult3 = "" + sqlResult3.slice(0, -2);
-	}
 
-    document.getElementById("jsOut").innerText = jsResult;
-    document.getElementById("jqOut").innerText = jqResult;
-    document.getElementById("phpOut").innerText = phpResult;
-	document.getElementById("sqlOut").innerText = sqlResult;
-	document.getElementById("sqlOut2").innerText = sqlResult2;
-	document.getElementById("sqlOut3").innerText = sqlResult3;
-    
-	// 📊 COUNTER UPDATE
+    if(jqResult)   jqResult   = jqResult.slice(0,-2);
+    if(sqlResult)  sqlResult  = ", "+sqlResult.slice(0,-2);
+    if(sqlResult2) sqlResult2 = ", "+sqlResult2.slice(0,-2);
+    if(sqlResult3) sqlResult3 = sqlResult3.slice(0,-2);
+
+    document.getElementById("jsOut").innerText   = jsResult;
+    document.getElementById("jqOut").innerText   = jqResult;
+    document.getElementById("phpOut").innerText  = phpResult;
+    document.getElementById("sqlOut").innerText  = sqlResult;
+    document.getElementById("sqlOut2").innerText = sqlResult2;
+    document.getElementById("sqlOut3").innerText = sqlResult3;
+
     document.getElementById("counter").innerText =
         `Total: ${total} | Unique: ${unique}`;
-
-    // 🏷 TAG DISPLAY
     document.getElementById("duplicateList").innerHTML = dupHTML;
 }
-// SEARCH LOGIC
+
 document.getElementById("searchBox").addEventListener("input", function(){
-
-    let keyword = this.value.toLowerCase();
-    let tags = document.querySelectorAll("#duplicateList .tag");
-
-    tags.forEach(tag => {
-
-        let text = tag.innerText.toLowerCase();
-
-        if(text.includes(keyword)){
-            tag.classList.remove("hide");
-        } else {
-            tag.classList.add("hide");
-        }
+    let kw = this.value.toLowerCase();
+    document.querySelectorAll("#duplicateList .tag").forEach(tag=>{
+        tag.classList.toggle("hide", !tag.innerText.toLowerCase().includes(kw));
     });
 });
-/* ---------- TEMPLATE ---------- */
 
+function copyText(id, btn){
+    let text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(()=>{
+        btn.textContent="Copied ✔";
+        btn.classList.add('copied');
+        setTimeout(()=>{btn.textContent="Copy";btn.classList.remove('copied');},1500);
+    });
+}
+
+/* Templates */
 function saveTemplate(){
     let val=document.getElementById("input").value.trim();
     if(!val) return;
-
     let list=JSON.parse(localStorage.getItem("tpl")||"[]");
     list.push(val);
     localStorage.setItem("tpl",JSON.stringify(list));
-
     loadTemplates();
 }
 
 function loadTemplates(){
     let select=document.getElementById("templates");
     select.innerHTML="";
-
     let list=JSON.parse(localStorage.getItem("tpl")||"[]");
-
     list.forEach((t,i)=>{
         let opt=document.createElement("option");
-        opt.value=i;
-        opt.text=t;
+        opt.value=i; opt.text=t;
         select.appendChild(opt);
     });
 }
@@ -272,7 +615,6 @@ function loadTemplates(){
 function loadTemplate(){
     let list=JSON.parse(localStorage.getItem("tpl")||"[]");
     let i=document.getElementById("templates").value;
-
     document.getElementById("input").value=list[i];
     generate();
 }
@@ -280,26 +622,103 @@ function loadTemplate(){
 function deleteTemplate(){
     let list=JSON.parse(localStorage.getItem("tpl")||"[]");
     let i=document.getElementById("templates").value;
-
     list.splice(i,1);
     localStorage.setItem("tpl",JSON.stringify(list));
-
     loadTemplates();
 }
 
-// init
 loadTemplates();
-function copyText(id) {
-    let text = document.getElementById(id).innerText;
 
-    navigator.clipboard.writeText(text)
-        .then(() => {
-            alert("Copied!");
-        })
-        .catch(err => {
-            console.log("Copy failed", err);
-        });
+/* ══ PANEL 2 LOGIC ══ */
+function p2Generate(){
+    var key    = document.getElementById("p2_key").value;
+    var chk    = document.getElementById("p2_chk").value;
+    var txt    = document.getElementById("p2_txt").value;
+    var fields = document.getElementById("p2_fields").value.split(",");
+    var code   = "";
+
+    code += "for (var i = 0; i < aa.length; i++) {\n";
+    code += "    if (aa[i] == \""+key+"\") {\n\n";
+    code += "        var "+chk+" = data."+chk+";\n";
+    code += "        if ("+chk+" == \"1\") {\n";
+    code += "            $('#"+txt+"').css(\"background-color\", \"#3CAF35\");\n";
+    code += "            $(\"#"+chk+"\").prop(\"checked\", true);\n\n";
+    code += "        } else {\n";
+    code += "            $('#"+txt+"').css(\"background-color\", \"WHITE\");\n";
+    code += "            $(\"#"+chk+"\").prop(\"checked\", false);\n";
+    code += "        }\n\n";
+
+    for(var i=0;i<fields.length;i++){
+        var f=fields[i].trim();
+        if(f) code += "        $('#"+f+"').val(data."+f+");\n";
+    }
+
+    code += "        break;\n";
+    code += "    } else { }\n";
+    code += "}\n";
+
+    document.getElementById("p2Output").innerText = code;
 }
+
+/* ══ PANEL 3 LOGIC ══ */
+function p3Generate(){
+    var key    = document.getElementById("p3_key").value;
+    var chk    = document.getElementById("p3_chk").value;
+    var fields = document.getElementById("p3_fields").value.split(",");
+    var code   = "";
+
+    code += "for (var i = 0; i < aa.length; i++) {\n";
+    code += "    if (aa[i] == \""+key+"\") {\n\n";
+    code += "        if (document.getElementById('"+chk+"').checked) {\n";
+    code += "            var "+chk+" = \"1\";\n";
+    code += "        } else {\n";
+    code += "            var "+chk+" = \"0\";\n";
+    code += "        }\n";
+
+    for(var i=0;i<fields.length;i++){
+        var f=fields[i].trim();
+        if(f) code += "        var "+f+" = $('#"+f+"').val();\n";
+    }
+
+    code += "\n        break;\n\n";
+    code += "    } else {\n";
+    code += "        var "+chk+" = \"0\";\n";
+
+    for(var i=0;i<fields.length;i++){
+        var f=fields[i].trim();
+        if(f) code += "        var "+f+" = \"\";\n";
+    }
+
+    code += "    }\n";
+    code += "}\n";
+
+    document.getElementById("p3Output").innerText = code;
+}
+
+/* ── SHARED COPY ── */
+function copyPre(id, btn){
+    var text = document.getElementById(id).innerText;
+    var tmp = document.createElement("textarea");
+    tmp.value = text;
+    document.body.appendChild(tmp);
+    tmp.select();
+    document.execCommand("copy");
+    document.body.removeChild(tmp);
+
+    var old = btn.innerText;
+    btn.innerText = "Copied ✔";
+    btn.style.background = "#238636";
+    btn.style.color = "#fff";
+    setTimeout(()=>{
+        btn.innerText = old;
+        btn.style.background = "";
+        btn.style.color = "";
+    }, 1500);
+}
+
+// Init both generators
+p2Generate();
+p3Generate();
 </script>
 
 </body>
