@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Code Generator</title>
+
+<style>
+body{
+    font-family: Arial;
+    margin: 20px;
+    background:#f6fff6;
+}
+
+/* 🟢 Minimal green style */
+h2{
+    color:#1b5e20;
+}
+
+textarea{
+    width:420px;
+    height:70px;
+    padding:8px;
+    border:1px solid #a5d6a7;
+    border-radius:6px;
+}
+
+button{
+    margin:4px;
+    padding:6px 10px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    background:#2e7d32;
+    color:white;
+}
+
+button:hover{
+    background:#1b5e20;
+}
+
+select{
+    width:420px;
+    margin-top:5px;
+    padding:5px;
+}
+
+/* OUTPUT BOX */
+pre{
+    background:#ffffff;
+    border:1px solid #c8e6c9;
+    padding:10px;
+    height:180px;
+    overflow:auto;
+    white-space:pre-wrap;
+    border-radius:6px;
+}
+</style>
+<style>
+.tag {
+    display:inline-block;
+    padding:4px 8px;
+    margin:3px;
+    border-radius:5px;
+    font-size:12px;
+    background:#e8f5e9;
+    border:1px solid #a5d6a7;
+}
+
+.tag.dup {
+    background:#ffebee;
+    border:1px solid red;
+    color:red;
+}
+</style>
+<style>
+#duplicateList {
+    margin-top:10px;
+}
+
+.tag {
+    display:inline-block;
+    padding:4px 8px;
+    margin:3px;
+    border-radius:5px;
+    font-size:12px;
+    background:#e8f5e9;
+    border:1px solid #a5d6a7;
+}
+
+.tag.dup {
+    background:#ffebee;
+    border:1px solid red;
+    color:red;
+}
+
+.tag.hide {
+    display:none;
+}
+</style>
+</head>
+
+<body>
+
+<h2>DAXYZ Code Generator Tool</h2>
+<input type="text" id="searchBox" placeholder="Search fields..." style="width:420px;padding:6px;margin-top:6px;">
+
+<br>
+<br>
+
+<textarea id="input" placeholder="chk_id, id_1, id_2, id_3"></textarea>
+
+<br>
+
+<div id="counter" style="margin:8px 0;font-weight:bold;color:#1b5e20;"></div>
+<div id="duplicateList" style="margin:8px 0;"></div>
+
+<br>
+
+<button onclick="generate()">Generate</button>
+<button onclick="saveTemplate()">💾 Save</button>
+
+<br>
+
+<select id="templates" onchange="loadTemplate()"></select>
+<button onclick="deleteTemplate()">🗑 Delete</button>
+
+<hr>
+
+<h3>1. billData first & second in Front file<button onclick="copyText('jsOut')">Copy</button></h3>
+<input type="checkbox" value="yes">
+<pre id="jsOut"></pre>
+
+<h3>2. action_type = data <button onclick="copyText('jqOut')">Copy</button></h3>
+<input type="checkbox" value="yes">
+<pre id="jqOut"></pre>
+
+<h3>3. action_type = add <button onclick="copyText('phpOut')">Copy</button></h3>
+<input type="checkbox" value="yes">
+<pre id="phpOut"></pre>
+
+<h3>4. uper in insert<button onclick="copyText('sqlOut')">Copy</button></h3>
+<input type="checkbox" value="yes">
+<pre id="sqlOut"></pre>
+
+<h3>5. down in insert<button onclick="copyText('sqlOut2')">Copy</button></h3>
+<input type="checkbox" value="yes">
+<pre id="sqlOut2"></pre>
+
+<h3>6. action_type = edit<button onclick="copyText('sqlOut3')">Copy</button></h3>
+<input type="checkbox" value="yes">
+<pre id="sqlOut3"></pre>
+
+<script>
+
+document.getElementById("input").addEventListener("input", generate);
+
+// ---------- GENERATE ----------
+function generate(){
+
+    let input = document.getElementById("input").value;
+    let fields = input.split(",");
+
+    let seen = {};
+    let total = 0;
+    let unique = 0;
+
+    let jsResult = "";
+    let jqResult = "";
+    let phpResult = "";
+	let sqlResult = "";
+	let sqlResult2 = "";
+	let sqlResult3 = "";
+    let dupHTML = "";
+
+    for(let f of fields){
+
+        let key = f.trim();
+        if(!key) continue;
+
+        total++;
+
+        // ❌ duplicate check
+        if(seen[key]){
+            dupHTML += `<span class="tag dup">❌ ${key} (duplicate)</span>`;
+            continue;
+        }
+
+        seen[key] = true;
+        unique++;
+
+        dupHTML += `<span class="tag">✔ ${key}</span>`;
+
+        jsResult += " + '&"+key+"=' + "+key;
+        jqResult += "'" + key + "' => $result['" + key + "'],\n";
+        phpResult += "$" + key + " = $_POST['" + key + "'];\n";
+		sqlResult += "`" + key + "`, ";
+		sqlResult2 += "'$" + key + "', ";
+		sqlResult3 += "`" + key + "` = '$_POST[" + key + "]',\n";
+				 
+		
+    }
+	if(jqResult){
+		jqResult = "" + jqResult.slice(0, -2);
+	}
+	if(sqlResult){
+		sqlResult = ", " + sqlResult.slice(0, -2);
+	}
+	if(sqlResult2){
+		sqlResult2 = ", " + sqlResult2.slice(0, -2);
+	}
+	if(sqlResult3){
+		sqlResult3 = "" + sqlResult3.slice(0, -2);
+	}
+
+    document.getElementById("jsOut").innerText = jsResult;
+    document.getElementById("jqOut").innerText = jqResult;
+    document.getElementById("phpOut").innerText = phpResult;
+	document.getElementById("sqlOut").innerText = sqlResult;
+	document.getElementById("sqlOut2").innerText = sqlResult2;
+	document.getElementById("sqlOut3").innerText = sqlResult3;
+    
+	// 📊 COUNTER UPDATE
+    document.getElementById("counter").innerText =
+        `Total: ${total} | Unique: ${unique}`;
+
+    // 🏷 TAG DISPLAY
+    document.getElementById("duplicateList").innerHTML = dupHTML;
+}
+// SEARCH LOGIC
+document.getElementById("searchBox").addEventListener("input", function(){
+
+    let keyword = this.value.toLowerCase();
+    let tags = document.querySelectorAll("#duplicateList .tag");
+
+    tags.forEach(tag => {
+
+        let text = tag.innerText.toLowerCase();
+
+        if(text.includes(keyword)){
+            tag.classList.remove("hide");
+        } else {
+            tag.classList.add("hide");
+        }
+    });
+});
+/* ---------- TEMPLATE ---------- */
+
+function saveTemplate(){
+    let val=document.getElementById("input").value.trim();
+    if(!val) return;
+
+    let list=JSON.parse(localStorage.getItem("tpl")||"[]");
+    list.push(val);
+    localStorage.setItem("tpl",JSON.stringify(list));
+
+    loadTemplates();
+}
+
+function loadTemplates(){
+    let select=document.getElementById("templates");
+    select.innerHTML="";
+
+    let list=JSON.parse(localStorage.getItem("tpl")||"[]");
+
+    list.forEach((t,i)=>{
+        let opt=document.createElement("option");
+        opt.value=i;
+        opt.text=t;
+        select.appendChild(opt);
+    });
+}
+
+function loadTemplate(){
+    let list=JSON.parse(localStorage.getItem("tpl")||"[]");
+    let i=document.getElementById("templates").value;
+
+    document.getElementById("input").value=list[i];
+    generate();
+}
+
+function deleteTemplate(){
+    let list=JSON.parse(localStorage.getItem("tpl")||"[]");
+    let i=document.getElementById("templates").value;
+
+    list.splice(i,1);
+    localStorage.setItem("tpl",JSON.stringify(list));
+
+    loadTemplates();
+}
+
+// init
+loadTemplates();
+
+</script>
+
+</body>
+</html>
